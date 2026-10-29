@@ -26,3 +26,20 @@ button:disabled { opacity: 0.4; cursor: default; }
 #stats td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; margin-top: 6px; }
 .legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; background: var(--c); vertical-align: middle; }
+
+.help { margin-top: 6px; font-size: 12px; }
+.help summary { cursor: pointer; opacity: 0.85; }
+.help svg { width: 100%; height: auto; margin: 8px 0 4px; }
+.help p { margin: 6px 0; }
+.help ul { margin: 4px 0; padding-left: 16px; }
+.help li { margin: 4px 0; }
+.hl-part { fill: #8884; stroke: #888; stroke-width: 1; }
+.hl-bed { fill: #888; }
+.hl-dim { stroke: #999; stroke-width: 1; }
+.hl-label { font-size: 9px; fill: currentColor; }
+.hl-dim-t { opacity: 0.8; }
+.hl-wall-a { fill: #e57373; }
+.hl-wall-b { fill: #ffb74d; }
+.hl-wall-c { fill: #81c784; }
+.sw { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 2px; vertical-align: middle; }
+.sw.hl-wall-a { background: #e57373; } .sw.hl-wall-b { background: #ffb74d; } .sw.hl-wall-c { background: #81c784; }

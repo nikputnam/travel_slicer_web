@@ -17,17 +17,55 @@
         </label>
         <fieldset>
           <legend>Hot end clearance</legend>
-          <label>Nozzle radius (mm) <input type="number" id="nozzleRadius" value="2.5" step="0.1" min="0" /></label>
-          <label>Nozzle height (mm) <input type="number" id="nozzleHeight" value="4" step="0.5" min="0" /></label>
-          <label>Shroud radius (mm) <input type="number" id="shroudRadius" value="30" step="1" min="0" /></label>
-          <label>Gantry height (mm, blank = none) <input type="number" id="gantryHeight" value="" step="1" min="0" /></label>
+          <label title="Radius of the nozzle tip and its cone. Walls closer than this can never be more than one layer above the nozzle, so they are printed layer by layer like a normal slicer.">Nozzle radius (mm) <input type="number" id="nozzleRadius" value="2.5" step="0.1" min="0" /></label>
+          <label title="Height from the nozzle tip up to the first wide part of the hot end (heater block, silicone sock, fan duct). Walls between nozzle radius and shroud radius may lead by up to this height.">Nozzle height (mm) <input type="number" id="nozzleHeight" value="4" step="0.5" min="0" /></label>
+          <label title="Radius of the widest part of the hot end around the nozzle axis: heater block, sock, part-cooling duct. Walls farther away than this are only limited by the gantry.">Shroud radius (mm) <input type="number" id="shroudRadius" value="30" step="1" min="0" /></label>
+          <label title="Height from the nozzle tip to the X gantry or any other part that spans the whole bed. Leave blank for printers where nothing spans the bed (most bed slingers and delta printers).">Gantry height (mm, blank = none) <input type="number" id="gantryHeight" value="" step="1" min="0" /></label>
+          <details class="help">
+            <summary>What do these mean?</summary>
+            <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" aria-label="Side view of a hot end over three printed walls">
+              <!-- gantry -->
+              <rect x="0" y="10" width="300" height="8" class="hl-part" />
+              <text x="150" y="30" class="hl-label" text-anchor="middle">gantry</text>
+              <!-- shroud / heater block -->
+              <rect x="55" y="60" width="130" height="46" rx="4" class="hl-part" />
+              <text x="120" y="88" class="hl-label" text-anchor="middle">heater block / shroud</text>
+              <!-- nozzle cone -->
+              <polygon points="104,106 136,106 124,150 116,150" class="hl-part" />
+              <!-- nozzle tip line -->
+              <line x1="0" y1="150" x2="300" y2="150" class="hl-dim" stroke-dasharray="3 3" />
+              <text x="4" y="146" class="hl-label">nozzle tip</text>
+              <!-- walls (bed at y=180) -->
+              <rect x="0" y="180" width="300" height="2" class="hl-bed" />
+              <rect x="126" y="146" width="6" height="34" class="hl-wall-a" />
+              <rect x="170" y="110" width="6" height="70" class="hl-wall-b" />
+              <rect x="262" y="22" width="6" height="158" class="hl-wall-c" />
+              <!-- dimensions -->
+              <line x1="120" y1="150" x2="120" y2="164" class="hl-dim" />
+              <line x1="104" y1="160" x2="120" y2="160" class="hl-dim" />
+              <text x="101" y="163" class="hl-label hl-dim-t" text-anchor="end">nozzle radius</text>
+              <line x1="120" y1="106" x2="120" y2="150" class="hl-dim" transform="translate(-55 0)" />
+              <text x="60" y="130" class="hl-label hl-dim-t" text-anchor="end">nozzle height</text>
+              <line x1="120" y1="56" x2="185" y2="56" class="hl-dim" />
+              <text x="152" y="52" class="hl-label hl-dim-t" text-anchor="middle">shroud radius</text>
+              <line x1="290" y1="18" x2="290" y2="150" class="hl-dim" />
+              <text x="286" y="90" class="hl-label hl-dim-t" text-anchor="end">gantry height</text>
+            </svg>
+            <p>Printed material must never be where the hot end will be. Looking down the nozzle axis, each wall already printed is allowed to stand higher than the nozzle tip by an amount that depends on how far away it is:</p>
+            <ul>
+              <li><span class="sw hl-wall-a"></span><b>Closer than the nozzle radius</b>: at most one layer. These walls are printed in step with their neighbours, layer by layer.</li>
+              <li><span class="sw hl-wall-b"></span><b>Between nozzle radius and shroud radius</b>: at most the nozzle height. Branches this far apart are printed in alternating chunks of that height.</li>
+              <li><span class="sw hl-wall-c"></span><b>Beyond the shroud radius</b>: at most the gantry height, or unlimited if blank. Branches this far apart become single full-height spirals.</li>
+            </ul>
+            <p>Measure your hot end from the nozzle tip and add a millimetre or two of margin. For a long clay nozzle, nozzle height is the length of the nozzle itself and shroud radius is the radius of the extruder body above it.</p>
+          </details>
         </fieldset>
         <fieldset>
           <legend>Printing</legend>
-          <label>Bottom layers to keep as sliced <input type="number" id="bottomLayers" value="3" step="1" min="0" /></label>
-          <label>Travel lift (mm) <input type="number" id="travelLift" value="1" step="0.1" min="0" /></label>
-          <label>Print speed (mm/s, blank = from file) <input type="number" id="printSpeed" value="" step="1" min="1" /></label>
-          <label>Fan (%, blank = from file) <input type="number" id="fan" value="" step="5" min="0" max="100" /></label>
+          <label title="These first layers are copied from the source file exactly as sliced (brim, skirt, solid bottom). The spiral starts above them.">Bottom layers to keep as sliced <input type="number" id="bottomLayers" value="3" step="1" min="0" /></label>
+          <label title="Extra height added above the tallest obstacle along a travel move.">Travel lift (mm) <input type="number" id="travelLift" value="1" step="0.1" min="0" /></label>
+          <label title="Override the extrusion speed. Blank uses the feed rate the slicer chose for each loop, which already includes its cooling slowdowns.">Print speed (mm/s, blank = from file) <input type="number" id="printSpeed" value="" step="1" min="1" /></label>
+          <label title="Part-cooling fan for the spiral section. Blank uses the profile's maximum fan speed when cooling is enabled.">Fan (%, blank = from file) <input type="number" id="fan" value="" step="5" min="0" max="100" /></label>
         </fieldset>
         <div class="row">
           <button id="process" disabled>Process</button>
