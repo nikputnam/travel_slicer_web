@@ -1,7 +1,7 @@
 /**
  * Decide the print order: which run to extend next and by how many layers, so that
  * (a) every loop is printed after its supports, and
- * (b) no already-printed material ever sits where the hot end will be.
+ * (b) no already-printed material ever sits where the extruder will be.
  *
  * The collision model is a stepped radius function of the height difference between printed
  * material and the nozzle tip: within nozzleRadius material may be at most one layer higher,

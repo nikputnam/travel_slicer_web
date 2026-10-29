@@ -56,13 +56,13 @@ export interface Run {
   bbox: BBox;
 }
 
-/** Hot-end collision model. Distances in mm. */
+/** Extruder collision model. Distances in mm. */
 export interface ClearanceModel {
   /** Radius around the nozzle tip within which printed material may be at most one layer higher. */
   nozzleRadius: number;
-  /** Height from the nozzle tip to the heater block / silicone sock / fan shroud. */
+  /** Height from the nozzle tip to the first wide part of the extruder (body, heater block, fan shroud). */
   nozzleHeight: number;
-  /** Radius of the heater block, sock and part-cooling shroud around the nozzle axis. */
+  /** Radius of the widest part of the extruder around the nozzle axis (body, heater block, fan shroud). */
   shroudRadius: number;
   /** Height from the nozzle tip to the X gantry (Infinity for bed slingers with nothing above). */
   gantryHeight: number;

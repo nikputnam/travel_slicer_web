@@ -16,20 +16,20 @@
           <span id="dropText">Drop a .gcode file here or click to choose</span>
         </label>
         <fieldset>
-          <legend>Hot end clearance</legend>
+          <legend>Extruder clearance</legend>
           <label title="Radius of the nozzle tip and its cone. Walls closer than this can never be more than one layer above the nozzle, so they are printed layer by layer like a normal slicer.">Nozzle radius (mm) <input type="number" id="nozzleRadius" value="2.5" step="0.1" min="0" /></label>
-          <label title="Height from the nozzle tip up to the first wide part of the hot end (heater block, silicone sock, fan duct). Walls between nozzle radius and shroud radius may lead by up to this height.">Nozzle height (mm) <input type="number" id="nozzleHeight" value="4" step="0.5" min="0" /></label>
-          <label title="Radius of the widest part of the hot end around the nozzle axis: heater block, sock, part-cooling duct. Walls farther away than this are only limited by the gantry.">Shroud radius (mm) <input type="number" id="shroudRadius" value="30" step="1" min="0" /></label>
+          <label title="Height from the nozzle tip up to the first wide part of the extruder (extruder body, heater block, fan duct). Walls between nozzle radius and shroud radius may lead by up to this height.">Nozzle height (mm) <input type="number" id="nozzleHeight" value="4" step="0.5" min="0" /></label>
+          <label title="Radius of the widest part of the extruder around the nozzle axis: extruder body, heater block, cooling duct. Walls farther away than this are only limited by the gantry.">Shroud radius (mm) <input type="number" id="shroudRadius" value="30" step="1" min="0" /></label>
           <label title="Height from the nozzle tip to the X gantry or any other part that spans the whole bed. Leave blank for printers where nothing spans the bed (most bed slingers and delta printers).">Gantry height (mm, blank = none) <input type="number" id="gantryHeight" value="" step="1" min="0" /></label>
           <details class="help">
             <summary>What do these mean?</summary>
-            <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" aria-label="Side view of a hot end over three printed walls">
+            <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" aria-label="Side view of an extruder over three printed walls">
               <!-- gantry -->
               <rect x="0" y="10" width="300" height="8" class="hl-part" />
               <text x="150" y="30" class="hl-label" text-anchor="middle">gantry</text>
-              <!-- shroud / heater block -->
+              <!-- extruder body / shroud -->
               <rect x="55" y="60" width="130" height="46" rx="4" class="hl-part" />
-              <text x="120" y="88" class="hl-label" text-anchor="middle">heater block / shroud</text>
+              <text x="120" y="88" class="hl-label" text-anchor="middle">extruder body / shroud</text>
               <!-- nozzle cone -->
               <polygon points="104,106 136,106 124,150 116,150" class="hl-part" />
               <!-- nozzle tip line -->
@@ -51,13 +51,13 @@
               <line x1="290" y1="18" x2="290" y2="150" class="hl-dim" />
               <text x="286" y="90" class="hl-label hl-dim-t" text-anchor="end">gantry height</text>
             </svg>
-            <p>Printed material must never be where the hot end will be. Looking down the nozzle axis, each wall already printed is allowed to stand higher than the nozzle tip by an amount that depends on how far away it is:</p>
+            <p>Printed material must never be where the extruder will be. Looking down the nozzle axis, each wall already printed is allowed to stand higher than the nozzle tip by an amount that depends on how far away it is:</p>
             <ul>
               <li><span class="sw hl-wall-a"></span><b>Closer than the nozzle radius</b>: at most one layer. These walls are printed in step with their neighbours, layer by layer.</li>
               <li><span class="sw hl-wall-b"></span><b>Between nozzle radius and shroud radius</b>: at most the nozzle height. Branches this far apart are printed in alternating chunks of that height.</li>
               <li><span class="sw hl-wall-c"></span><b>Beyond the shroud radius</b>: at most the gantry height, or unlimited if blank. Branches this far apart become single full-height spirals.</li>
             </ul>
-            <p>Measure your hot end from the nozzle tip and add a millimetre or two of margin. For a long clay nozzle, nozzle height is the length of the nozzle itself and shroud radius is the radius of the extruder body above it.</p>
+            <p>Measure your extruder from the nozzle tip and add a millimetre or two of margin. For a paste or clay extruder with a long nozzle, nozzle height is the length of the nozzle itself and shroud radius is the radius of the extruder body above it.</p>
           </details>
         </fieldset>
         <fieldset>
