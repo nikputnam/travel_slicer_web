@@ -1,0 +1,28 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; font-size: 14px; }
+body { margin: 0; }
+#app { display: flex; height: 100vh; }
+#panel { flex: 0 0 330px; width: 330px; padding: 12px 14px; overflow-y: auto; box-sizing: border-box; border-right: 1px solid #8884; background: Canvas; }
+#view { flex: 1 1 0; min-width: 0; position: relative; overflow: hidden; background: #1b1e24; }
+#view canvas { display: block; position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+h1 { font-size: 18px; margin: 0 0 6px; }
+.hint { font-size: 12px; opacity: 0.8; margin: 0 0 10px; }
+.drop { display: block; border: 2px dashed #8886; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; margin-bottom: 10px; }
+.drop.over { border-color: #4a9; background: #4a91; }
+.drop input { display: none; }
+fieldset { border: 1px solid #8884; border-radius: 6px; margin: 0 0 10px; padding: 6px 10px 8px; }
+legend { font-size: 12px; opacity: 0.8; }
+fieldset label { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 4px 0; font-size: 13px; }
+fieldset input[type=number] { width: 80px; }
+fieldset input[type=range] { width: 160px; }
+.row { display: flex; gap: 8px; margin-bottom: 10px; }
+button { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #8886; background: #4a9; color: white; cursor: pointer; font-weight: 600; }
+button:disabled { opacity: 0.4; cursor: default; }
+#messages .err { color: #e55; font-size: 12px; margin: 4px 0; }
+#messages .warn { color: #d93; font-size: 12px; margin: 4px 0; }
+#messages .advice { opacity: 0.75; font-size: 12px; margin: 4px 0; }
+#stats { font-size: 12px; margin: 8px 0; }
+#stats table { border-collapse: collapse; width: 100%; }
+#stats td { padding: 2px 4px; border-bottom: 1px solid #8883; }
+#stats td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; margin-top: 6px; }
+.legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; background: var(--c); vertical-align: middle; }
