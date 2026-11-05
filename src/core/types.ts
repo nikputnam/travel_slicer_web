@@ -42,6 +42,8 @@ export interface Layer {
   raw: string[];
   /** Number of non-wall extrusion paths that were present in the source (infill, brim...). */
   droppedPaths: number;
+  /** Every extruding move in the source, walls and infill alike, as polylines of flat xyz triples (for previewing passthrough layers). */
+  extrusions: number[][];
 }
 
 /** A maximal chain of loops, one per consecutive layer, that can be printed as one spiral. */

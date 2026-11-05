@@ -106,4 +106,21 @@ describe('end-to-end plan', () => {
     expect(r.gcode.startsWith(expected)).toBe(true);
     expect(r.gcode.endsWith(p.footer.join('\n'))).toBe(true);
   });
+
+  it('previews every extruding move of the passthrough layers, solid infill included', () => {
+    const src = fixture('cylinder');
+    const p = parsePrusaGcode(src);
+    const bottom = p.layers.slice(0, 3);
+    const pass = plan(src, settings({}, 3)).preview.filter((x) => x.kind === 'passthrough');
+    const segs = pass.reduce((a, x) => a + x.xyz.length / 3 - 1, 0);
+    // the fixture uses relative E, so an extruding move is a G1 with X/Y and a positive E word
+    const moves = bottom.flatMap((l) => l.raw).filter((l) => /^G1 [^;]*[XY]/.test(l) && /E\.?\d/.test(l.split(';')[0])).length;
+    expect(segs).toBe(moves);
+    const wallSegs = bottom.reduce((a, l) => a + l.loops.reduce((b, c) => b + c.pts.length, 0), 0);
+    expect(segs).toBeGreaterThan(wallSegs * 2);
+    const zs = [...new Set(pass.flatMap((x) => x.xyz.filter((_, i) => i % 3 === 2)))].sort((a, b) => a - b);
+    expect(zs.length).toBe(3);
+    zs.forEach((z, i) => expect(z).toBeCloseTo(bottom[i].z, 6));
+    expect(plan(src, settings({}, 0)).preview.some((x) => x.kind === 'passthrough')).toBe(false);
+  });
 });

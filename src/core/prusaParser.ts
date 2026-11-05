@@ -132,6 +132,8 @@ export function parsePrusaGcode(text: string): ParsedGcode {
   let curType = '';
   let curWidth = defaultWidth;
   let path: Path | null = null;
+  /** Polyline of consecutive extruding moves being recorded into cur.extrusions. */
+  let stroke: number[] | null = null;
   let loopId = 0;
   let openWalls = 0;
   const closeTolFor = (w: number) => Math.max(1.0, 2.5 * w);
@@ -164,7 +166,8 @@ export function parsePrusaGcode(text: string): ParsedGcode {
     if (line.startsWith(';LAYER_CHANGE')) {
       finishPath();
       if (cur) { layerEndState.push({ ...st }); }
-      cur = { index: layers.length, z: NaN, height: NaN, loops: [], raw: [], droppedPaths: 0 };
+      cur = { index: layers.length, z: NaN, height: NaN, loops: [], raw: [], droppedPaths: 0, extrusions: [] };
+      stroke = null;
       layers.push(cur);
       cur.raw.push(line);
       continue;
@@ -199,6 +202,11 @@ export function parsePrusaGcode(text: string): ParsedGcode {
       if (de < 0) st.retracted += -de;
       else if (de > 0 && !hasXY) st.retracted = Math.max(0, st.retracted - de);
       else if (de > 0 && st.retracted > 0) st.retracted = 0;
+
+      if (hasXY && de > 0) {
+        if (!stroke) { stroke = [st.x, st.y, st.z]; cur.extrusions.push(stroke); }
+        stroke.push(nx, ny, nz);
+      } else stroke = null;
 
       if (hasXY && de > 0 && nz === st.z) {
         if (!path) path = { pts: [{ x: st.x, y: st.y }], type: curType, width: curWidth, feed: st.feed, e: 0, length: 0 };

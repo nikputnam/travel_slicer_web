@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { PreviewPath } from '../core/toolpath.ts';
-import type { Layer } from '../core/types.ts';
 
 export const RUN_COLORS = ['#4fc3f7', '#ffb74d', '#81c784', '#e57373', '#ba68c8', '#fff176', '#4db6ac', '#f06292', '#a1887f', '#90a4ae', '#7986cb', '#aed581'];
 
@@ -46,13 +45,17 @@ export class Viewer {
   }
 
   /** Replace the displayed toolpath. */
-  setPaths(paths: PreviewPath[], bottomLayers: Layer[]) {
+  setPaths(paths: PreviewPath[]) {
     for (const o of [this.extrude, this.travel, this.bottom]) if (o) { this.scene.remove(o); o.geometry.dispose(); }
-    const ex: number[] = [], exc: number[] = [], tr: number[] = [];
+    const ex: number[] = [], exc: number[] = [], tr: number[] = [], bo: number[] = [];
     this.extrudeEnds = []; this.travelEnds = [];
     let segIdx = -1;
     const pushEnds = () => { this.extrudeEnds.push(ex.length / 3); this.travelEnds.push(tr.length / 3); };
     for (const p of paths) {
+      if (p.kind === 'passthrough') {
+        for (let i = 3; i < p.xyz.length; i += 3) bo.push(p.xyz[i - 3], p.xyz[i - 2], p.xyz[i - 1], p.xyz[i], p.xyz[i + 1], p.xyz[i + 2]);
+        continue;
+      }
       while (segIdx < p.segment) { if (segIdx >= 0) pushEnds(); segIdx++; }
       const c = new THREE.Color(RUN_COLORS[p.runId % RUN_COLORS.length]);
       for (let i = 3; i < p.xyz.length; i += 3) {
@@ -70,17 +73,10 @@ export class Viewer {
     };
     this.extrude = mk(ex, exc);
     this.travel = mk(tr, undefined, new THREE.LineBasicMaterial({ color: 0xff5252, transparent: true, opacity: 0.8 }));
-    const bo: number[] = [];
-    for (const l of bottomLayers) for (const loop of l.loops) {
-      for (let i = 0; i < loop.pts.length; i++) {
-        const a = loop.pts[i], b = loop.pts[(i + 1) % loop.pts.length];
-        bo.push(a.x, a.y, l.z, b.x, b.y, l.z);
-      }
-    }
     this.bottom = mk(bo, undefined, new THREE.LineBasicMaterial({ color: 0x778899 }));
     this.scene.add(this.extrude, this.travel, this.bottom);
 
-    const box = new THREE.Box3().setFromObject(this.extrude);
+    const box = new THREE.Box3().setFromObject(this.extrude).expandByObject(this.bottom);
     if (!box.isEmpty()) {
       const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()).length();
       this.controls.target.copy(c);

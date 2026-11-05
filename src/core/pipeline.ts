@@ -46,7 +46,10 @@ export function planFromParsed(parsed: ParsedGcode, settings: PlanSettings, fanO
 
   const out: string[] = [...parsed.header];
   const preview: PreviewPath[] = [];
-  for (let i = 0; i < bottom; i++) out.push(...parsed.layers[i].raw);
+  for (let i = 0; i < bottom; i++) {
+    out.push(...parsed.layers[i].raw);
+    for (const xyz of parsed.layers[i].extrusions) preview.push({ kind: 'passthrough', xyz, runId: -1, segment: -1 });
+  }
   out.push(...tp.lines);
   out.push(...parsed.footer);
 

@@ -84,7 +84,7 @@ function process() {
   $('stats').innerHTML = '<table>' + rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('') + '</table>' +
     '<div class="legend">' + result.runs.slice(0, 24).map((r) => `<span style="--c:${RUN_COLORS[r.id % RUN_COLORS.length]}">run ${r.id} (${r.loops.length} layers)</span>`).join('') + (result.runs.length > 24 ? '<span>…</span>' : '') + '</div>';
 
-  viewer.setPaths(result.preview, parsed.layers.slice(0, settings.bottomLayers));
+  viewer.setPaths(result.preview);
   const range = $<HTMLInputElement>('segRange');
   range.max = String(viewer.segmentCount);
   range.value = range.max;
