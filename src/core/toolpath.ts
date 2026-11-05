@@ -85,7 +85,6 @@ export function generateToolpath(segments: Segment[], layers: Layer[], opts: Wri
   let travels = 0, travelDistance = 0, extrusionDistance = 0;
   const printed: PrintedLoop[] = [];
   const seamOf = new Map<Run, Vec2>();
-  let maxLayerReached = -1;
 
   const emit = (l: string) => lines.push(l);
   const setFeed = (f: number) => { if (f !== curFeed) { curFeed = f; return ` F${f3(f)}`; } return ''; };
@@ -156,19 +155,19 @@ export function generateToolpath(segments: Segment[], layers: Layer[], opts: Wri
       const start = pts[0];
       seamOf.set(run, start);
 
+      // Mark every loop as a layer of its own. G-code previewers (PrusaSlicer's among them) start a new step of
+      // their layer slider at each ;LAYER_CHANGE, in print order, whatever the height. Marking only the first
+      // visit to each height would lump every later segment that revisits lower layers into a single step.
+      emit(';LAYER_CHANGE');
+      emit(`;Z:${f3(z1)}`);
+      emit(`;HEIGHT:${f3(layer.height)}`);
       if (li === seg.from) {
         travelTo(start, z0, segIdx, run.id);
         doUnretract();
+        emit(';TYPE:External perimeter');
+        emit(`;WIDTH:${f3(loop.width)}`);
       }
       // within a segment the next loop's seam is adjacent to the current position: no travel
-
-      if (loop.layer > maxLayerReached) {
-        maxLayerReached = loop.layer;
-        emit(';LAYER_CHANGE');
-        emit(`;Z:${f3(z1)}`);
-        emit(`;HEIGHT:${f3(layer.height)}`);
-      }
-      if (li === seg.from) { emit(';TYPE:External perimeter'); emit(`;WIDTH:${f3(loop.width)}`); }
 
       const total = perimeter(pts, true);
       const e = ePerMm(loop.width, layer.height, flow);

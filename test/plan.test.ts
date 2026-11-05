@@ -107,6 +107,33 @@ describe('end-to-end plan', () => {
     expect(r.gcode.endsWith(p.footer.join('\n'))).toBe(true);
   });
 
+  it('marks every loop as its own layer so previewers step through the print in order', () => {
+    for (const name of ['two_towers', 'y_split', 'thick_tube']) {
+      const r = plan(fixture(name), settings({}, 3));
+      const loops = r.segments.reduce((a, s) => a + (s.to - s.from), 0);
+      const lines = r.gcode.split('\n');
+      const begin = lines.findIndex((l) => l.startsWith('; ---- TRAvel web: spiralised section begins'));
+      const end = lines.findIndex((l) => l.startsWith('; ---- TRAvel web: spiralised section ends'));
+      // group the way PrusaSlicer's preview does: a new slider step at every ;LAYER_CHANGE
+      const steps: { height: number; zMin: number; zMax: number }[] = [];
+      let z = NaN;
+      for (const l of lines.slice(begin, end)) {
+        if (l.startsWith(';LAYER_CHANGE')) { steps.push({ height: NaN, zMin: Infinity, zMax: -Infinity }); continue; }
+        const step = steps[steps.length - 1];
+        if (l.startsWith(';HEIGHT:')) { step.height = parseFloat(l.slice(8)); continue; }
+        if (!l.startsWith('G1 ')) continue;
+        const zm = /Z(-?[\d.]+)/.exec(l);
+        if (zm) z = parseFloat(zm[1]);
+        if (/[XY]/.test(l) && /E/.test(l)) { step.zMin = Math.min(step.zMin, z); step.zMax = Math.max(step.zMax, z); }
+      }
+      expect(steps.length).toBe(loops);
+      for (const s of steps) {
+        expect(s.zMax).toBeGreaterThan(s.zMin);
+        expect(s.zMax - s.zMin).toBeLessThanOrEqual(s.height + 1e-6);
+      }
+    }
+  });
+
   it('previews every extruding move of the passthrough layers, solid infill included', () => {
     const src = fixture('cylinder');
     const p = parsePrusaGcode(src);
