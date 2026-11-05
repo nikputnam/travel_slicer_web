@@ -73,7 +73,17 @@ export function numOrPercent(v: string | undefined, base: number, fallback: numb
   return Number.isFinite(n) ? n : fallback;
 }
 
+/** Message shown when the input is Prusa binary G-code (.bgcode), which is not decoded here. */
+export const BINARY_GCODE_ERROR =
+  'This is a binary G-code file (.bgcode), which this tool cannot read. ' +
+  'In PrusaSlicer, turn off binary G-code export: untick "Use binary G-code when the printer supports it" ' +
+  'in Preferences → Other (or "Supports binary G-code" in Printer Settings → General), ' +
+  'then export the G-code again as a plain .gcode file.';
+
 export function parsePrusaGcode(text: string): ParsedGcode {
+  // Binary G-code starts with the magic bytes "GCDE"; its G-code blocks are compressed, so no markers are visible.
+  if (text.startsWith('GCDE')) throw new Error(BINARY_GCODE_ERROR);
+
   const lines = text.split(/\r?\n/);
   const warnings: string[] = [];
   const config = parseConfig(lines);

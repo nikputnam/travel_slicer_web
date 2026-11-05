@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { parsePrusaGcode, validateConfig } from '../src/core/prusaParser.ts';
+import { BINARY_GCODE_ERROR, parsePrusaGcode, validateConfig } from '../src/core/prusaParser.ts';
 import { ePerMm } from '../src/core/toolpath.ts';
 import { fixture } from './helpers.ts';
 
 describe('PrusaSlicer parser', () => {
+  it('explains how to turn off binary G-code when given a .bgcode file', () => {
+    // .bgcode header: magic "GCDE", version 1, CRC32 checksums, then a metadata block.
+    const bgcode = 'GCDE\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x42\x00\x00\x00\x00\x00Producer=PrusaSlicer 2.9.6\n';
+    expect(() => parsePrusaGcode(bgcode)).toThrow(BINARY_GCODE_ERROR);
+    expect(BINARY_GCODE_ERROR).toMatch(/binary G-code/);
+    expect(BINARY_GCODE_ERROR).toMatch(/PrusaSlicer/);
+  });
+
   it('parses a plain cylinder into one loop per layer', () => {
     const p = parsePrusaGcode(fixture('cylinder'));
     expect(p.layers.length).toBe(100);
